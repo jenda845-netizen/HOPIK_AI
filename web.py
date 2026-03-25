@@ -70,5 +70,12 @@ def init_db():
         print("✅ Databáze vytvořena! Login: admin / admin-heslo-123")
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        if not User.query.filter_by(username="admin").first():
+            new_user = User(username="admin", password="admin-heslo-123")
+            db.session.add(new_user)
+            db.session.commit()
     app.run(host='0.0.0.0', port=5000)
+
 
