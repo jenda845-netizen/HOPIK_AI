@@ -6,7 +6,10 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'blahovec-super-tajne-heslo'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///uzivatele.db'
+# Použijeme SQLite v dočasné složce Renderu
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/uzivatele.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -59,23 +62,14 @@ def generovat():
     except Exception as e:
         return render_template('index.html', odpoved=f"Chyba: {str(e)}")
 
-# PŘÍKAZ PRO VYTVOŘENÍ PRVNÍHO ÚČTU (Spustit jen jednou)
-@app.cli.command("init-db")
-def init_db():
+# Automatické vytvoření databáze při každém startu
+with app.app_context():
     db.create_all()
     if not User.query.filter_by(username="admin").first():
-        new_user = User(username="admin", password="admin-heslo-123")
-        db.session.add(new_user)
+        admin = User(username="admin", password="admin-heslo-123")
+        db.session.add(admin)
         db.session.commit()
-        print("✅ Databáze vytvořena! Login: admin / admin-heslo-123")
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username="admin").first():
-            new_user = User(username="admin", password="admin-heslo-123")
-            db.session.add(new_user)
-            db.session.commit()
     app.run(host='0.0.0.0', port=5000)
-
 
