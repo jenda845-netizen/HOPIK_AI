@@ -1,43 +1,73 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import openai
+import os
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'blahovec-super-tajne-heslo'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///uzivatele.db'
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
-# Tvůj klíč
 openai.api_key = "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"
 
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(username=request.form.get('username')).first()
+        if user and user.password == request.form.get('password'):
+            login_user(user)
+            return redirect(url_for('index'))
+        flash('❌ Špatné jméno nebo heslo')
+    return render_template('login.html')
+
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/generovat', methods=['POST'])
+@login_required
 def generovat():
     vstup = request.form.get('vstup')
     sluzba = request.form.get('sluzba')
-    if not vstup:
-        return render_template('index.html', odpoved="⚠️ Zadejte prosím zadání.")
-    
-    # TADY JE TA ZMĚNA - PROFI POPISKY
     prompty = {
-        "recenze": f"Napiš diplomatickou odpověď na recenzi: {vstup}",
-        "popisky": f"Vytvoř luxusní prodejní popisek produktu: {vstup}. Použij techniku AIDA. Začni háčkem, popiš emoci z používání, přidej technické parametry v odrážkách a zakonči silnou výzvou k akci (CTA).",
-        "social": f"Navrhni 3 posty na sítě (včetně emoji): {vstup}",
-        "recepty": f"Vytvoř recept a kalkulaci v CZK: {vstup}",
-        "prodej": f"Napiš B2B prodejní email pro firmu: {vstup}",
-        "reklama": f"Vytvoř 3 úderné verze reklamy na: {vstup}"
+        "recenze": f"Odpověz na recenzi: {vstup}",
+        "popisky": f"Vytvoř prodejní AIDA popisek: {vstup}",
+        "social": f"Navrhni posty na sítě: {vstup}",
+        "recepty": f"Vytvoř recept a kalkulaci: {vstup}",
+        "prodej": f"Napiš B2B email: {vstup}",
+        "reklama": f"Vytvoř reklamu: {vstup}"
     }
-
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Jsi elitní český copywriter a marketér. Píšeš poutavě, moderně a s důrazem na prodej."},
-                {"role": "user", "content": prompty.get(sluzba, "Ahoj")}
-            ]
+            messages=[{"role": "system", "content": "Jsi expert Blahovec AI."}, {"role": "user", "content": prompty.get(sluzba)}]
         )
         return render_template('index.html', odpoved=response.choices[0].message.content)
     except Exception as e:
-        return render_template('index.html', odpoved=f"❌ Chyba: {str(e)}")
+        return render_template('index.html', odpoved=f"Chyba: {str(e)}")
+
+# PŘÍKAZ PRO VYTVOŘENÍ PRVNÍHO ÚČTU (Spustit jen jednou)
+@app.cli.command("init-db")
+def init_db():
+    db.create_all()
+    if not User.query.filter_by(username="admin").first():
+        new_user = User(username="admin", password="admin-heslo-123")
+        db.session.add(new_user)
+        db.session.commit()
+        print("✅ Databáze vytvořena! Login: admin / admin-heslo-123")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

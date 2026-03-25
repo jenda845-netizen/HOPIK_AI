@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blahovec AI - Přihlášení</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { background: #020617; color: #ffffff; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; }
+        .input-field { background: #020617; border: 1px solid #1e293b; transition: all 0.3s ease; }
+        .input-field:focus { border-color: #2563eb; box-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
+        .btn-login { background: linear-gradient(90deg, #2563eb, #7c3aed); font-weight: 900; transition: all 0.4s ease; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase leading-none text-white">
+                BLAHOVEC<span class="text-blue-500">.AI</span>
+            </h1>
+            <p class="text-slate-500 text-[10px] uppercase tracking-[0.4em] mt-3 font-bold italic text-center">Security Access Point</p>
+        </header>
+
+        <div class="glass-card p-8 shadow-2xl">
+            <h2 class="text-center text-sm font-bold uppercase tracking-widest text-slate-400 mb-8 italic">Vstup do systému</h2>
+            
+            <form action="/login" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Uživatelské jméno</label>
+                    <input type="text" name="username" required class="input-field w-full py-4 px-5 rounded-2xl outline-none text-white placeholder:text-slate-700 font-medium" placeholder="admin">
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Přístupové heslo</label>
+                    <input type="password" name="password" required class="input-field w-full py-4 px-5 rounded-2xl outline-none text-white placeholder:text-slate-700 font-medium" placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-login w-full py-5 rounded-2xl text-white uppercase tracking-[0.3em] text-xs mt-4">
+                    Autorizovat přístup ⚡
+                </button>
+            </form>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="mt-6 text-center text-red-400 text-xs font-bold animate-pulse">
+                  {{ messages[0] }}
+                </div>
+              {% endif %}
+            {% endwith %}
+        </div>
+        
+        <p class="mt-8 text-center text-slate-600 text-[10px] uppercase tracking-widest font-medium">
+            &copy; 2026 BLAHOVEC INTELLIGENCE SYSTEMS
+        </p>
+    </div>
+</body>
+</html>
+
