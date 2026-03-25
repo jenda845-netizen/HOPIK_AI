@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blahovec AI Agency Elite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { background: #020617; color: #ffffff; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; }
+        .service-btn { background: #0f172a; border: 1px solid #1e293b; transition: all 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%; }
+        input[type="radio"]:checked + .service-btn { background: #2563eb; border-color: #60a5fa; box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); transform: translateY(-2px); }
+        .main-submit { background: linear-gradient(90deg, #2563eb, #7c3aed); transition: all 0.4s ease; font-weight: 900; }
+        .result-box { background: #ffffff; color: #0f172a; border-radius: 24px; border-left: 10px solid #2563eb; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="p-4 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-2xl">
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-black italic tracking-tighter uppercase leading-none">BLAHOVEC<span class="text-blue-500">.AI</span></h1>
+            <p class="text-slate-500 text-[10px] uppercase tracking-[0.5em] mt-3 font-bold italic">Smart Business Engine</p>
+        </header>
+
+        <div class="glass-card p-6 sm:p-10 shadow-2xl">
+            <form action="/generovat" method="POST" class="space-y-8">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-6 text-center italic">Aktivovat pracovní modul</label>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        
+                        <label>
+                            <input type="radio" name="sluzba" value="recenze" class="hidden" checked onclick="updatePlaceholder('Vložte text zákaznické recenze pro vytvoření profi odpovědi...')">
+                            <div class="service-btn py-4 px-2 rounded-2xl text-[9px] font-bold text-center uppercase tracking-widest leading-tight min-h-[64px]">
+                                Odpovědi na<br>Recenze
+                            </div>
+                        </label>
+                        
+                        <label>
+                            <input type="radio" name="sluzba" value="popisky" class="hidden" onclick="updatePlaceholder('Zadejte název produktu a parametry pro tvorbu prodejního textu...')">
+                            <div class="service-btn py-4 px-2 rounded-2xl text-[9px] font-bold text-center uppercase tracking-widest leading-tight min-h-[64px]">
+                                Prodejní<br>Popisky
+                            </div>
+                        </label>
+                        
+                        <label>
+                            <input type="radio" name="sluzba" value="social" class="hidden" onclick="updatePlaceholder('Zadejte téma pro tvorbu příspěvků a scénářů na sítě...')">
+                            <div class="service-btn py-4 px-2 rounded-2xl text-[9px] font-bold text-center uppercase tracking-widest leading-tight min-h-[64px]">
+                                Obsah na<br>Sociální Sítě
+                            </div>
+                        </label>
+                        
+                        <label>
+                            <input type="radio" name="sluzba" value="recepty" class="hidden" onclick="updatePlaceholder('Zadejte název jídla pro recepturu a výpočet nákladů...')">
+                            <div class="service-btn py-4 px-2 rounded-2xl text-[9px] font-bold text-center uppercase tracking-widest leading-tight min-h-[64px]">
+                                Gastro<br>Kalkulace
+                            </div>
+                        </label>
+                        
+                        <label>
+                            <input type="radio" name="sluzba" value="prodej" class="hidden" onclick="updatePlaceholder('Zadejte firmu a službu, kterou chcete e-mailem nabídnout...')">
+                            <div class="service-btn py-4 px-2 rounded-2xl text-[9px] font-bold text-center uppercase tracking-widest leading-tight min-h-[64px]">
+                                Prodejní<br>E-maily
+                            </div>
+                        </label>
+                        
+                        <label>
+                            <input type="radio" name="sluzba" value="reklama" class="hidden" onclick="updatePlaceholder('Zadejte co propagujete pro tvorbu textů reklamních kampaní...')">
+                            <div class="service-btn py-4 px-2 rounded-2xl text-[9px] font-bold text-center uppercase tracking-widest leading-tight min-h-[64px]">
+                                Texty pro<br>Reklamy (ADS)
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <textarea id="inputArea" name="vstup" rows="5" class="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-white outline-none focus:border-blue-500 transition-all placeholder:text-slate-700 italic text-sm" placeholder="Vložte text zákaznické recenze pro vytvoření profi odpovědi..."></textarea>
+                
+                <button type="submit" class="main-submit w-full py-5 text-white rounded-2xl uppercase tracking-[0.3em] text-sm shadow-xl shadow-blue-500/20 active:scale-95 transition-transform">
+                    Spustit Strategický Výpočet ✨
+                </button>
+            </form>
+        </div>
+
+        {% if odpoved %}
+        <div class="mt-8 result-box p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+                <span class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.2em] italic">Výstup Systému Blahovec AI</span>
+                <span class="text-[10px] font-bold text-slate-400 font-mono">CODE: 200_OK</span>
+            </div>
+            <div class="text-slate-900 text-lg leading-relaxed whitespace-pre-wrap font-medium italic">
+                {{ odpoved }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function updatePlaceholder(text) {
+            document.getElementById('inputArea').placeholder = text;
+        }
+    </script>
+</body>
+</html>
+

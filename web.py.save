@@ -1,0 +1,135 @@
+ķ
+
+# Tvůj klíč s nabitým kreditem
+client = OpenAI(api_key="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")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/generovat', methods=['POST'])
+def generovat():
+    vstup = request.form.get('vstup')
+    sluzba = request.form.get('sluzba')
+    
+    if not vstup:
+        return render_template('index.html', odpoved="⚠️ Napište zadání!")
+
+    # Dynamické prompty pro tvoje byznysy
+    prompty = {
+        "recenze": f"Napiš profi odpověď na recenzi: {vstup}",
+        "popisky": f"Vytvoř prodejní popisek pro: {vstup}",
+        "social": f"Navrhni příspěvky na sítě pro: {vstup}",
+        "recepty": f"Vytvoř recept a kalkulaci porcí pro: {vstup}",
+        "prodej": f"Napiš prodejní e-mail pro: {vstup}",
+        "reklama": f"Vytvoř FB/Google reklamu pro: {vstup}"
+    }
+
+    try:
+        # Nový způsob volání GPT-3.5 Turbo
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Jsi expert Blahovec AI Agency. Piš špičkově česky."},
+                {"role": "user", "content": prompty.get(sluzba, "Ahoj")}
+            ]
+        )
+        odpoved_ai = completion.choices[0].message.content
+        return render_template('index.html', odpoved=odpoved_ai)
+    
+    except Exception as e:
+        # Pokud by kredit ještě "nepropadl" do systému, uvidíš to tady
+        return render_template('index.html', odpoved=f"❌ CHYBA: {str(e)}")
+
+if __name__ from flask import Flask, render_template, request
+import openai
+
+app = Flask(__name__)
+
+# Tvůj klíč
+openai.api_key = "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"
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/generovat', methods=['POST'])
+def generovat():
+    vstup = request.form.get('vstup')
+    sluzba = request.form.get('sluzba')
+    
+    if not vstup:
+        return render_template('index.html', odpoved="⚠️ Napište zadání!")
+
+    prompty = {
+        "recenze": f"Napiš profi odpověď na recenzi: {vstup}",
+        "popisky": f"Vytvoř prodejní popisek pro: {vstup}",
+        "social": f"Navrhni příspěvky na sítě pro: {vstup}",
+        "recepty": f"Vytvoř recept a kalkulaci porcí pro: {vstup}",
+        "prodej": f"Napiš prodejní e-mail pro: {vstup}",
+        "reklama": f"Vytvoř FB/Google reklamu pro: {vstup}"
+    }
+
+    try:
+        # Zápis pro verzi openai 0.28
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Jsi expert Blahovec AI Agency. Piš špičkově česky."},
+                {"role": "user", "content": prompty.get(sluzba, "Ahoj")}
+            ]
+        )
+        odpoved_ai = response.choices[0].message.content
+        return render_template('index.html', odpoved=odpoved_ai)
+    
+    except Exception as e:
+        return render_template('index.html', odpoved=f"❌ CHYBA: {str(e)}")
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+from flask import Flask, render_template, request
+import openai
+
+app = Flask(__name__)
+
+# Tvůj klíč
+openai.api_key = "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"
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/generovat', methods=['POST'])
+def generovat():
+    vstup = request.form.get('vstup')
+    sluzba = request.form.get('sluzba')
+    
+    if not vstup:
+        return render_template('index.html', odpoved="⚠️ Napište zadání!")
+
+    prompty = {
+        "recenze": f"Napiš profi odpověď na recenzi: {vstup}",
+        "popisky": f"Vytvoř prodejní popisek pro: {vstup}",
+        "social": f"Navrhni příspěvky na sítě pro: {vstup}",
+        "recepty": f"Vytvoř recept a kalkulaci porcí pro: {vstup}",
+        "prodej": f"Napiš prodejní e-mail pro: {vstup}",
+        "reklama": f"Vytvoř FB/Google reklamu pro: {vstup}"
+    }
+
+    try:
+        # Zápis pro verzi openai 0.28
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Jsi expert Blahovec AI Agency. Piš špičkově česky."},
+                {"role": "user", "content": prompty.get(sluzba, "Ahoj")}
+            ]
+        )
+        odpoved_ai = response.choices[0].message.content
+        return render_template('index.html', odpoved=odpoved_ai)
+    
+    except Exception as e:
+        return render_template('index.html', odpoved=f"❌ CHYBA: {str(e)}")
+
+if __name__ == '__main__':
+  
