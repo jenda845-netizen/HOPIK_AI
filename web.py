@@ -1,15 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
+from flask_login import LoginManager, UserMixin, login_user, login_required
 import openai
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'blahovec-ultra-tajemstvi'
+app.config['SECRET_KEY'] = 'blahovec-super-heslo-999'
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# TVŮJ KLÍČ ZŮSTÁVÁ STEJNÝ
 openai.api_key = "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"
 
-# Jednoduchý uživatel bez databáze
+# Jednoduchá třída pro uživatele (bez databáze)
 class User(UserMixin):
     def __init__(self, id):
         self.id = id
@@ -23,7 +24,7 @@ def load_user(user_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Tady jsou tvoje přístupové údaje natvrdo
+        # KONTROLA HESLA NATVRDO - JISTOTA PRO FREE TARIF
         if request.form.get('username') == 'admin' and request.form.get('password') == 'admin-heslo-123':
             user = User("admin")
             login_user(user)
