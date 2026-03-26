@@ -1,47 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, login_required
+from flask import Flask, render_template, request
 import openai
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'blahovec-super-heslo-999'
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
 
-# TVŮJ KLÍČ ZŮSTÁVÁ STEJNÝ
+# TVŮJ KLÍČ
 openai.api_key = "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"
 
-# Jednoduchá třída pro uživatele (bez databáze)
-class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
-
-@login_manager.user_loader
-def load_user(user_id):
-    if user_id == "admin":
-        return User("admin")
-    return None
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        # KONTROLA HESLA NATVRDO - JISTOTA PRO FREE TARIF
-        if request.form.get('username') == 'admin' and request.form.get('password') == 'admin-heslo-123':
-            user = User("admin")
-            login_user(user)
-            return redirect(url_for('index'))
-        flash('❌ Špatné jméno nebo heslo')
-    return render_template('login.html')
-
 @app.route('/')
-@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/generovat', methods=['POST'])
-@login_required
 def generovat():
     vstup = request.form.get('vstup')
     sluzba = request.form.get('sluzba')
+    
     prompty = {
         "recenze": f"Odpověz na recenzi: {vstup}",
         "popisky": f"Vytvoř prodejní AIDA popisek: {vstup}",
@@ -50,12 +23,17 @@ def generovat():
         "prodej": f"Napiš B2B email: {vstup}",
         "reklama": f"Vytvoř reklamu: {vstup}"
     }
+    
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": "Jsi expert Blahovec AI."}, {"role": "user", "content": prompty.get(sluzba)}]
+            messages=[
+                {"role": "system", "content": "Jsi expert Blahovec AI, mluvíš česky a profesionálně."},
+                {"role": "user", "content": prompty.get(sluzba)}
+            ]
         )
-        return render_template('index.html', odpoved=response.choices[0].message.content)
+        vysledek = response.choices[0].message.content
+        return render_template('index.html', odpoved=vysledek)
     except Exception as e:
         return render_template('index.html', odpoved=f"Chyba: {str(e)}")
 
